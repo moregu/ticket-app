@@ -8,6 +8,7 @@ var _ = require('underscore');
 var fs = require('fs');
 var avosExpressHttpsRedirect = require('avos-express-https-redirect');
 var crypto = require('crypto');
+var avosExpressCookieSession=require('avos-express-cookie-session');
 
 var admin = require('cloud/madmin.js');
 var login = require('cloud/login.js');
@@ -28,6 +29,7 @@ app.set('view engine', 'ejs');    // 设置template引擎
 app.use(avosExpressHttpsRedirect());
 app.use(express.bodyParser());    // 读取请求body的中间件
 app.use(express.cookieParser(config.cookieParserSalt));
+app.use(avosExpressCookieSession({ cookie: { maxAge: 3600000 },fetchUser:true}));
 app.use(expressLayouts);
 app.use(login.clientTokenParser());
 app.use(app.router);
@@ -483,7 +485,7 @@ function getStatisticsEachType(admins, ticketThreads) {
   for (var type in type2showMap) {
     type2name[type] = [];
     admins.forEach(function (admin) {
-      if (admin.types.indexOf(type) >= 0) {
+      if (admin.types && admin.types.indexOf(type) >= 0) {
         type2name[type].push(admin.username);
       }
     });
